@@ -1,0 +1,32 @@
+{
+"type": "FeatureCollection",
+"name": "msfpe_2",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nombre": "Estacion Mitre", "ubicacion": "GENERAL LOPEZ 3750" }, "geometry": { "type": "Point", "coordinates": [ -60.724353384858709, -31.654610397031512 ] } },
+{ "type": "Feature", "properties": { "nombre": "Boca de Tigre", "ubicacion": "JJ PASO Y ZAVALLA" }, "geometry": { "type": "Point", "coordinates": [ -60.725176142777187, -31.661315788528764 ] } },
+{ "type": "Feature", "properties": { "nombre": "Iglesia Cristiana Evangelica", "ubicacion": "JUAN DE GARAY 4405" }, "geometry": { "type": "Point", "coordinates": [ -60.732360522554032, -31.648175677405632 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Juan de Garay", "ubicacion": "SALVADOR CAPUTTO 3955" }, "geometry": { "type": "Point", "coordinates": [ -60.722530678582046, -31.636429004416435 ] } },
+{ "type": "Feature", "properties": { "nombre": "Salon Parroquial San Francisco Solano", "ubicacion": "PRESIDENTE PERON 4210" }, "geometry": { "type": "Point", "coordinates": [ -60.720131962792003, -31.625119199724235 ] } },
+{ "type": "Feature", "properties": { "nombre": "Cementerio Municipal", "ubicacion": "BLAS PARERA 5401" }, "geometry": { "type": "Point", "coordinates": [ -60.718636532836697, -31.613794724346267 ] } },
+{ "type": "Feature", "properties": { "nombre": "Polideportivo La Tablada", "ubicacion": "TENIENTE LOZA 6970" }, "geometry": { "type": "Point", "coordinates": [ -60.745517557463373, -31.563819639868552 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Guadalupe Oeste", "ubicacion": "RISSO 1745" }, "geometry": { "type": "Point", "coordinates": [ -60.683679334836654, -31.603102565574936 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Pro Mejoras Alto Verde", "ubicacion": "MANZANA 5 DEMETRIO GOMEZ" }, "geometry": { "type": "Point", "coordinates": [ -60.700766762473002, -31.665214362232465 ] } },
+{ "type": "Feature", "properties": { "nombre": "Talleres Municipales", "ubicacion": "PRESIDENTE PERON 3575" }, "geometry": { "type": "Point", "coordinates": [ -60.717543822780435, -31.632127731930144 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Centenario", "ubicacion": "ZAVALIA 721" }, "geometry": { "type": "Point", "coordinates": [ -60.722364524875616, -31.664875210891935 ] } },
+{ "type": "Feature", "properties": { "nombre": "Templo Hay Vida en Jesus", "ubicacion": "COLASTINE SUR" }, "geometry": { "type": "Point", "coordinates": [ -60.602881657555344, -31.660724539620123 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Ceferino Namuncura", "ubicacion": "12 DE OCTUBRE 9501" }, "geometry": { "type": "Point", "coordinates": [ -60.739584019970863, -31.568924788757716 ] } },
+{ "type": "Feature", "properties": { "nombre": "Polideportivo Aceria", "ubicacion": "CAFFERATA Y BERUTTI" }, "geometry": { "type": "Point", "coordinates": [ -60.73268205594038, -31.585605718054424 ] } },
+{ "type": "Feature", "properties": { "nombre": "Vecinal Sarmiento", "ubicacion": "VIEYTES 5047" }, "geometry": { "type": "Point", "coordinates": [ -60.72546603984965, -31.596499997101372 ] } },
+{ "type": "Feature", "properties": { "nombre": "Bomberos Voluntarios", "ubicacion": "BLAS PARERA 8700" }, "geometry": { "type": "Point", "coordinates": [ -60.726890108176704, -31.580017510733388 ] } },
+{ "type": "Feature", "properties": { "nombre": "Esquina Encendida", "ubicacion": "ESTANISLAO ZEBALLOS 3310" }, "geometry": { "type": "Point", "coordinates": [ -60.703130204178414, -31.603392185423701 ] } },
+{ "type": "Feature", "properties": { "nombre": "Club Banco Provincial", "ubicacion": "ARISTOBULO DEL VALLE 9958" }, "geometry": { "type": "Point", "coordinates": [ -60.689281710907593, -31.573584848223991 ] } },
+{ "type": "Feature", "properties": { "nombre": "CIC ROCA", "ubicacion": "CALLEJON ROCA Y REPUBLICA DE SIRIA" }, "geometry": { "type": "Point", "coordinates": [ -60.684338748666725, -31.57853389895131 ] } },
+{ "type": "Feature", "properties": { "nombre": "Sociedad de Quinteros", "ubicacion": "ALFONSINA STORNI Y ARISTOBULO DEL VALLE" }, "geometry": { "type": "Point", "coordinates": [ -60.691150200557914, -31.584073952053217 ] } },
+{ "type": "Feature", "properties": { "nombre": "VECINAL SANTA MARTA", "ubicacion": "CHUBUT 6291" }, "geometry": { "type": "Point", "coordinates": [ -60.732890241727986, -31.570992271072459 ] } },
+{ "type": "Feature", "properties": { "nombre": "ESCUELA JARDIN DE LA ESPERANZA", "ubicacion": "PEÑALOZA 8420" }, "geometry": { "type": "Point", "coordinates": [ -60.710944398956116, -31.585452699504042 ] } },
+{ "type": "Feature", "properties": { "nombre": "PARADA OMNIBUS", "ubicacion": "R1 Y CALLE FAVALORO" }, "geometry": { "type": "Point", "coordinates": [ -60.626541146433269, -31.638100700348552 ] } },
+{ "type": "Feature", "properties": { "nombre": "CAPILLA NUESTRA SEÑORA DE LA GUARDIA", "ubicacion": "ANTONIO DE PETRE Y HERMANA BOAGLIO" }, "geometry": { "type": "Point", "coordinates": [ -60.634339817041308, -31.642342046859472 ] } },
+{ "type": "Feature", "properties": { "nombre": "LA VIRGENCITA", "ubicacion": "RN168 Y CALLE PRINCIPAL" }, "geometry": { "type": "Point", "coordinates": [ -60.633658319021762, -31.639728642929157 ] } }
+]
+}

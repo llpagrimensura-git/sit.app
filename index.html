@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+
+    <title>sit.app</title>
+
+    <!-- Estilos y librerías de qgis2web / OpenLayers -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
+
+    <!-- Estilos personalizados (mockup estilo “app”) -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        background: #f5f7fb;
+      }
+
+      /* Layout general: header arriba, 3 columnas abajo */
+      #app {
+        display: grid;
+        grid-template-rows: 64px auto;
+        grid-template-columns: 280px auto 320px;
+        grid-template-areas:
+          "header header header"
+          "sidebar-left map sidebar-right";
+        width: 100%;
+        height: 100%;
+      }
+
+      header {
+        grid-area: header;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        background: linear-gradient(90deg, #016B91, #ED8153);
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      }
+
+      header .title-block {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      header .title-block span.logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(220, 220, 220);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      header h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      header .subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      /* Panel izquierdo: capas */
+      #sidebar-left {
+        grid-area: sidebar-left;
+        padding: 16px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* Panel derecho: herramientas */
+      #sidebar-right {
+        grid-area: sidebar-right;
+        padding: 16px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* Tarjetas / paneles internos */
+      .card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 4px 10px rgba(15,27,40,0.08);
+        box-sizing: border-box;
+      }
+
+      .card h3 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #22314a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .card h3 .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #2ecc71;
+      }
+
+      .card small {
+        font-size: 11px;
+        color: #7a869a;
+      }
+
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #42526e;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      input[type="text"], select {
+        width: 100%;
+        padding: 6px 8px;
+        font-size: 12px;
+        border-radius: 8px;
+        border: 1px solid #d0d4e4;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      input[type="text"]:focus, select:focus {
+        border-color: #0074d9;
+        box-shadow: 0 0 0 2px rgba(0,116,217,0.15);
+      }
+
+      button.btn {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #016B91;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      button.btn.secondary {
+        background: #ffffff;
+        color: #016B91;
+        border: 1px solid #d0d4e4;
+      }
+
+      button.btn:hover {
+        filter: brightness(1.05);
+      }
+
+      /* Contenedor del mapa */
+      #map-container {
+			grid-area: map;
+			position: relative;
+			padding: 0;
+			height: calc(100vh - 64px); /* alto total menos header */
+      }
+
+      #map {
+        width: 100%;
+        height: 100%;
+        }
+
+      /* Pop-up de qgis2web */
+      .ol-popup {
+        font-size: 12px;
+      }
+
+      /* Ajuste de controles OL al estilo UI */
+      .ol-control {
+        background-color: rgba(255,255,255,0.9)!important;
+        border-radius: 8px!important;
+        padding: 4px!important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        margin-top: 80px!important; /* los bajamos un poco para que no choquen con el header */
+      }
+
+      .ol-zoom, .ol-rotate {
+        right: 24px!important;
+        left: auto!important;
+      }
+
+      /* Layer switcher original de qgis2web; lo adaptamos visualmente */
+      .layer-switcher {
+        font-size: 12px;
+      }
+      .layer-switcher li {
+        margin-bottom: 4px;
+      }
+	  
+//POP UP		
+/* Contenedor principal del popup */
+.ol-popup {
+  position: absolute;
+  background: transparent;
+  padding: 0;
+  border: none;
+  bottom: 12px;
+  left: -50%;
+}
+
+/* Burbuja blanca */
+.popup-bubble {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 180px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  font-size: 12px;
+  color: #22314a;
+}
+
+/* Título */
+.popup-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e6e9ef;
+  padding-bottom: 4px;
+}
+
+/* Tabla */
+.popup-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.popup-label {
+  font-weight: 600;
+  padding-right: 6px;
+  color: #42526e;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.popup-value {
+  color: #172b4d;
+}
+
+/* Flechita tipo nube */
+.popup-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0 8px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+/* =======================
+   PANELES COLAPSABLES
+   ======================= */
+
+#sidebar-left,
+#sidebar-right {
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+
+/* Ocultos */
+#sidebar-left.collapsed {
+  width: 0 !important;
+  padding: 0;
+}
+
+#sidebar-right.collapsed {
+  width: 0 !important;
+  padding: 0;
+}
+
+/* Botones */
+.toggle-btn {
+  position: absolute;
+  top: 80px; /* debajo del header */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: #016B91;
+  color: #fff;
+  font-size: 14px;
+  z-index: 50;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* Botón izquierdo */
+.toggle-btn.left {
+  left: 280px;
+}
+
+/* Botón derecho */
+.toggle-btn.right {
+  right: 320px;
+}
+
+/* Cuando están colapsados */
+#app.left-collapsed .toggle-btn.left {
+  left: 0;
+}
+
+#app.right-collapsed .toggle-btn.right {
+  right: 0;
+}
+
+#app.left-collapsed {
+  grid-template-columns: 0 auto 320px;
+}
+
+#app.right-collapsed {
+  grid-template-columns: 280px auto 0;
+}
+
+#app.both-collapsed {
+  grid-template-columns: 0 auto 0;
+}
+
+
+      /* Responsive básico */
+@media (max-width: 900px) {
+
+  #app {
+    grid-template-rows: 64px auto;
+    grid-template-columns: 100%;
+    grid-template-areas:
+      "header"
+      "map";
+  }
+
+  #sidebar-left,
+  #sidebar-right {
+    position: absolute;
+    top: 64px;
+    height: calc(100% - 64px);
+    width: 280px;
+    z-index: 20;
+    background: #f5f7fb;
+    transition: transform 0.3s ease;
+  }
+
+  #sidebar-left {
+    left: 0;
+  }
+
+  #sidebar-right {
+    right: 0;
+  }
+
+  #sidebar-left.collapsed {
+    transform: translateX(-100%);
+  }
+
+  #sidebar-right.collapsed {
+    transform: translateX(100%);
+  }
+}
+
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <!-- HEADER -->
+      <header>
+        <div class="title-block">
+			<span class="logo">
+					🌎
+			</span>		
+          <div>
+            <h1>sit.app</h1>
+            <div class="subtitle">Sistema de Información Territorial</div>
+          </div>
+        </div>
+        <div style="font-size:12px;opacity:0.8;">
+  DEMO desarrollado por 
+  <a href="https://www.linkedin.com/in/llpagrimensura" 
+     target="_blank" 
+     style="color:#ffffff;text-decoration:underline;">
+    LLP
+  </a>
+</div>
+      </header>
+
+<!-- BOTÓN PANEL IZQUIERDO -->
+<button class="toggle-btn left" id="toggle-left" title="Capas">❯</button>
+
+<!-- BOTÓN PANEL DERECHO -->
+<button class="toggle-btn right" id="toggle-right" title="Herramientas">❮</button>
+
+
+
+      <!-- SIDEBAR IZQUIERDA: CAPAS -->
+      <aside id="sidebar-left">
+          <!-- Card de árbol de capas (aquí insertamos el layer-switcher de qgis2web) -->
+        <section class="card">
+          <h3><span class="dot"></span> Capas</h3>
+          <!-- <small>Capas generadas en qGIS (.geojson)</small> lo comento por ahora no lo necesito -->
+          <div id="layer-tree">
+            <!-- Aquí se moverá el control .layer-switcher existente -->
+          </div>
+        </section>
+      
+	  <!-- Card de capas base -->
+        <section class="card">
+          <h3><span class="dot"></span> Mapas Base</h3>
+           <!-- <small>Seleccioná tu capa base</small> lo comento por ahora no lo necesito -->
+          <select id="basemap-select">
+            <option value="osm">OSM estándar</option>
+			<option value="ign-gris">IGN Gris</option>
+          </select>
+        </section>
+	</aside>
+
+      <!-- MAPA -->
+      <main id="map-container">
+        <div id="map">
+          <div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- SIDEBAR DERECHA: HERRAMIENTAS -->
+      <aside id="sidebar-right">
+	  
+        <!-- Card: buscador -->
+        <section class="card">
+          <h3><span class="dot"></span> Buscar ubicación</h3>
+          <label for="search-input">Dirección</label>
+		  <small>Ej: “San Jeronimo 1459”</small>
+          <input id="search-input" type="text" placeholder="Escribí una dirección">
+          <button class="btn" id="btn-search">
+            <span class="fa fa-search"></span> Buscar </button>
+		  <button class="btn secondary" id="btn-geolocate" title="Usar mi ubicación"> 📍 Mi ubicación </button>
+
+       <!-- Card: filtros -->
+        <section class="card">
+          <h3><span class="dot"></span> Filtros</h3>
+          <label for="filter-layer">Capa</label>
+          <select id="filter-layer">        
+          </select>
+
+          <label for="filter-field">Campo</label>
+          <select id="filter-field">
+				<option value="">Seleccionar un campo</option>
+				<option value="nombre">nombre</option>
+				<option value="categoria">categoria</option>
+           </select>
+
+          <label for="filter-value">Valor</label>
+			<select id="filter-value"></select>
+
+
+          <button class="btn" id="btn-apply-filter">
+            <span class="fa fa-filter"></span> Aplicar filtro
+          </button>
+		  <button class="btn secondary" id="btn-clear-filter">
+			<span class="fa fa-eraser"></span> Borrar filtro
+		</button>		
+		  
+        </section>
+      </aside>
+    </div>
+	
+	<script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+	<script src="styles/msfd.js"></script>
+	<script src="styles/msfpe.js"></script>
+	<script src="styles/ecopuntos.js"></script>
+	<script src="styles/styles.js"></script>
+	<script src="popups/popups.js"></script>
+
+    <!-- SCRIPT DE INTEGRACIÓN (mockup + qgis2web) -->
+    <script>
+	
+	var osmBase = new ol.layer.Tile({
+		source: new ol.source.OSM()
+			});
+			
+	var ignGrisBase = new ol.layer.Tile({
+  visible: false,
+  source: new ol.source.XYZ({
+    url: 'https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png',
+    attributions: '© Instituto Geográfico Nacional (IGN)'
+  })
+});
+
+var baseLayers = {
+  osm: osmBase,
+  'ign-gris': ignGrisBase
+};
+
+document.getElementById('basemap-select').addEventListener('change', function () {
+  var selected = this.value;
+
+  Object.values(baseLayers).forEach(layer => {
+    layer.setVisible(false);
+  });
+
+  baseLayers[selected].setVisible(true);
+});
+
+
+			// MAPA
+	var map = new ol.Map({
+		target: 'map',
+		controls: [], 
+		layers: [osmBase, ignGrisBase],
+		view: new ol.View({
+			center: ol.proj.fromLonLat([-60.7, -31.63]),
+			zoom: 12
+		})
+			});
+
+const geojsonLayers = {};
+
+// ========================
+// CARGA DE CAPAS GEOJSON
+// ========================
+
+async function loadGeoJSONLayers() {
+  const response = await fetch('layers/layers.json');
+  const files = await response.json();
+
+  files.forEach(item => {
+    const layerKey = item.file.replace('.geojson', '');
+    const styleFn = getLayerStyle(layerKey);
+
+    const source = new ol.source.Vector({
+      url: `layers/${item.file}`,
+      format: new ol.format.GeoJSON()
+    });
+
+    const layer = new ol.layer.Vector({
+      source: source,
+      style: styleFn || defaultVectorStyle
+    });
+	
+	layer.set('layerKey', item.file.replace('.geojson', ''));
+
+    map.addLayer(layer);
+
+    // 🔥 ESTO ES LO QUE FALTABA / FALLABA
+    geojsonLayers[item.name] = layer;
+
+    addLayerToPanel(item.name, layer);
+  });
+
+  // 🔥 SOLO ACÁ se llena el select
+  populateFilterLayers();
+}
+
+const overlay = new ol.Overlay({
+  element: document.getElementById('popup'),
+  positioning: 'bottom-center',
+  stopEvent: true,
+  offset: [0, -10]
+});
+
+map.addOverlay(overlay);
+
+map.on('singleclick', function (evt) {
+  let found = false;
+
+  map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+    const layerKey = layer.get('layerKey');
+    if (!layerKey) return;
+
+    const html = buildPopupContent(feature, layerKey);
+    if (!html) return;
+
+    document.getElementById('popup-content').innerHTML = html;
+    overlay.setPosition(evt.coordinate);
+    found = true;
+
+    return true; // detener búsqueda
+  });
+
+  if (!found) {
+    overlay.setPosition(undefined);
+  }
+});
+
+document.getElementById('popup-closer').onclick = function () {
+  overlay.setPosition(undefined);
+  return false;
+};
+
+// ========================
+// Paneles colapsables
+// ========================
+
+const app = document.getElementById('app');
+const sidebarLeft = document.getElementById('sidebar-left');
+const sidebarRight = document.getElementById('sidebar-right');
+const btnLeft = document.getElementById('toggle-left');
+const btnRight = document.getElementById('toggle-right');
+
+btnLeft.addEventListener('click', () => {
+  sidebarLeft.classList.toggle('collapsed');
+  updateLayout();
+});
+
+btnRight.addEventListener('click', () => {
+  sidebarRight.classList.toggle('collapsed');
+  updateLayout();
+});
+
+function updateLayout() {
+  const left = sidebarLeft.classList.contains('collapsed');
+  const right = sidebarRight.classList.contains('collapsed');
+
+  app.classList.toggle('left-collapsed', left);
+  app.classList.toggle('right-collapsed', right);
+  app.classList.toggle('both-collapsed', left && right);
+
+  btnLeft.textContent = left ? '❯' : '❮';
+  btnRight.textContent = right ? '❮' : '❯';
+
+  // 🔥 CLAVE para que el mapa se expanda
+  setTimeout(() => {
+    map.updateSize();
+  }, 310);
+}
+
+// ========================
+// FILTRO
+// ========================
+
+const filterLayerSelect = document.getElementById('filter-layer');
+const filterFieldSelect = document.getElementById('filter-field');
+const filterValueSelect = document.getElementById('filter-value');
+
+const visibleStyle = null;
+const hiddenStyle = new ol.style.Style({ display: 'none' });
+
+function populateFilterLayers() {
+  const select = document.getElementById('filter-layer');
+  select.innerHTML = '';
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'Seleccione una capa';
+  select.appendChild(placeholder);
+
+  Object.keys(geojsonLayers).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    select.appendChild(opt);
+  });
+}
+
+function updateFilterValues() {
+  filterValueSelect.innerHTML = '';
+
+  const layerName = filterLayerSelect.value;
+  const field = filterFieldSelect.value;
+
+  if (!layerName || !field) {
+    filterValueSelect.disabled = true;
+    return;
+  }
+
+  const layer = geojsonLayers[layerName];
+  if (!layer) return;
+
+  const features = layer.getSource().getFeatures();
+  if (!features.length) return;
+
+  // 🚫 la capa no tiene ese campo
+  if (!(field in features[0].getProperties())) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = `La capa no posee el campo "${field}"`;
+    opt.disabled = true;
+    opt.selected = true;
+    filterValueSelect.appendChild(opt);
+    filterValueSelect.disabled = true;
+    return;
+  }
+
+  // ✅ valores únicos
+  const values = [...new Set(
+    features
+      .map(f => f.get(field))
+      .filter(v => v !== null && v !== undefined && v !== '')
+  )].sort((a, b) => String(a).localeCompare(String(b), 'es'));
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'Seleccione un valor';
+  filterValueSelect.appendChild(placeholder);
+
+  values.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = v;
+    filterValueSelect.appendChild(opt);
+  });
+
+  filterValueSelect.disabled = false;
+}
+
+filterLayerSelect.addEventListener('change', updateFilterValues);
+filterFieldSelect.addEventListener('change', updateFilterValues);
+
+document.getElementById('btn-apply-filter').addEventListener('click', () => {
+  const layerName = filterLayerSelect.value;
+  const field = filterFieldSelect.value;
+  const value = filterValueSelect.value;
+
+  if (!layerName || !field || !value) {
+    alert('Seleccione capa, campo y valor');
+    return;
+  }
+
+  const layer = geojsonLayers[layerName];
+  if (!layer) return;
+
+  layer.getSource().getFeatures().forEach(feature => {
+    const match = String(feature.get(field)) === String(value);
+    feature.setStyle(match ? visibleStyle : hiddenStyle);
+  });
+});
+
+document.getElementById('btn-clear-filter').addEventListener('click', () => {
+  // 1️⃣ Restaurar estilos de todas las capas
+  Object.values(geojsonLayers).forEach(layer => {
+    layer.getSource().getFeatures().forEach(feature => {
+      feature.setStyle(visibleStyle); // vuelve al estilo original
+    });
+  });
+
+  // 2️⃣ Resetear selects
+  filterLayerSelect.value = '';
+  filterFieldSelect.value = '';
+  filterValueSelect.innerHTML = '';
+
+  // 3️⃣ Deshabilitar valores
+  filterValueSelect.disabled = true;
+
+  // (opcional) si querés bloquear campo hasta elegir capa
+  // filterFieldSelect.disabled = false; // o true, según tu UX
+});
+
+// agrega un checkbox en el panel izquierdo
+function addLayerToPanel(name, layer) {
+  const id = `chk-${name}`;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <label style="font-size:13px;">
+      <input type="checkbox" id="${id}" checked>
+      ${name}
+    </label>
+  `;
+  document.getElementById('layer-tree').appendChild(div);
+
+  document.getElementById(id).addEventListener('change', function () {
+    layer.setVisible(this.checked);
+	
+  });
+}
+
+window.addEventListener('load', () => {
+  loadGeoJSONLayers();
+});
+
+// ========================
+// BUSCADOR CON MARCADOR + POPUP
+// ========================
+
+// elementos del DOM
+var searchInput = document.getElementById('search-input');
+var btnSearch = document.getElementById('btn-search');
+
+// capa para el marcador
+var markerLayer = new ol.layer.Vector({
+  source: new ol.source.Vector()
+});
+map.addLayer(markerLayer);
+
+// evento de búsqueda
+btnSearch.addEventListener('click', async function () {
+  var q = searchInput.value;
+  if (!q) return;
+
+  var url = 'https://nominatim.openstreetmap.org/search?format=json' +
+          '&q=' + encodeURIComponent(q) +
+          '&bounded=1' +
+          '&viewbox=' + '-60.78,-31.60,-60.65,-31.72';
+
+  try {
+    var res = await fetch(url);
+    var data = await res.json();
+
+    if (data && data.length > 0) {
+      var lon = parseFloat(data[0].lon);
+      var lat = parseFloat(data[0].lat);
+      var coord = ol.proj.fromLonLat([lon, lat]);
+
+      // mover el mapa
+      map.getView().animate({
+        center: coord,
+        zoom: 17,
+        duration: 800
+      });
+
+      // limpiar anteriores
+      markerLayer.getSource().clear();
+
+      // crear feature del marcador
+      var marker = new ol.Feature({
+        geometry: new ol.geom.Point(coord),
+        info: data[0].display_name
+      });
+
+      // estilo del marcador
+      marker.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 7,
+          fill: new ol.style.Fill({ color: 'rgba(255,0,0,0.8)' }),
+          stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+        })
+      }));
+
+      markerLayer.getSource().addFeature(marker);
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Error al buscar la dirección.');
+  }
+});
+
+// ========================
+// GEOLOCALIZACIÓN DEL DISPOSITIVO
+// ========================
+
+var btnGeolocate = document.getElementById('btn-geolocate');
+
+btnGeolocate.addEventListener('click', function () {
+
+  if (!navigator.geolocation) {
+    alert('La geolocalización no está disponible en este navegador.');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      var lon = position.coords.longitude;
+      var lat = position.coords.latitude;
+      var coord = ol.proj.fromLonLat([lon, lat]);
+
+      // mover el mapa (igual que la búsqueda)
+      map.getView().animate({
+        center: coord,
+        zoom: 17,
+        duration: 800
+      });
+
+      // limpiar marcador anterior
+      markerLayer.getSource().clear();
+
+      // crear feature del marcador
+      var marker = new ol.Feature({
+        geometry: new ol.geom.Point(coord),
+        info: 'Ubicación actual'
+      });
+
+      // MISMO estilo que el buscador
+      marker.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 7,
+          fill: new ol.style.Fill({ color: 'rgba(255,0,0,0.8)' }),
+          stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+        })
+      }));
+
+      markerLayer.getSource().addFeature(marker);
+    },
+    function () {
+      alert('No se pudo obtener la ubicación.');
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000
+    }
+  );
+});
+
+
+// popup contenido de la capa
+
+function buildPopupContent(feature, layerKey) {
+  const config = popupConfig[layerKey];
+  if (!config) return null;
+
+  let html = `<div class="popup-bubble">`;
+  html += `<div class="popup-title">${config.title}</div>`;
+  html += `<table class="popup-table">`;
+
+  config.fields.forEach(field => {
+    const value = feature.get(field.key);
+    if (value !== undefined && value !== null && value !== '') {
+      html += `
+        <tr>
+          <td class="popup-label">${field.label}</td>
+          <td class="popup-value">${value}</td>
+        </tr>
+      `;
+    }
+  });
+
+  html += `</table></div>`;
+  return html;
+}
+
+    </script>
+  </body>
+</html>

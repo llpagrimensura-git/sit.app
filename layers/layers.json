@@ -1,0 +1,14 @@
+[
+  {
+    "file": "msfd.geojson",
+    "name": "Distritos"
+  },
+  {
+    "file": "msfpe.geojson",
+    "name": "Puntos de Encuentro"
+  },
+    {
+    "file": "ecopuntos.geojson",
+    "name": "Ecopuntos"
+  }
+]
