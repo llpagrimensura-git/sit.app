@@ -1,7 +1,6 @@
 # Sistema de Información Territorial
 
-**sit.app** es un visor web de información geográfica orientado a la visualización, consulta y filtrado de capas geoespaciales en formato **GeoJSON**, utilizando **OpenLayers** como motor de mapas.
-El proyecto está pensado como una base extensible para geoportales municipales o institucionales, con una arquitectura simple, clara y fácil de mantener.
+**sit.app** es un Sistema de Información Territorial web de información geográfica orientado a la visualización, consulta y gestión de capas geoespaciales en formato **GeoJSON**, utilizando **OpenLayers** como motor de mapas. El proyecto está orientado organismos públicos, municipios y comunas, consultoras, proyectos academicos y equipos técnicos. El sistema permite construir visores cartográficos modernos, responsivos y escalables, integrando datos geográficos provenientes de múltiples fuentes y facilitando su uso en procesos de gestión, planificación y análisis territorial.
 
 ---
 
@@ -21,12 +20,10 @@ El proyecto está pensado como una base extensible para geoportales municipales 
 
 ## 🧱 Tecnologías utilizadas
 
-- **HTML5**
-- **CSS3**
-- **JavaScript**
-- **OpenLayers**
-- **OpenStreetMap**
-- **Nominatim (OpenStreetMap)** para geocodificación
+- Frontend: **HTML5, CSS3, JavaScript**
+- Librería cartográfica: **OpenLayers**
+- Datos: **GeoJSON, OpenStreeMap, IGN**
+- Diseño UI: Layout tipo aplicación (paneles colapsables)
 
 El proyecto no utiliza frameworks (React, Angular, Vue), lo que facilita su despliegue en entornos simples y servidores institucionales.
 
@@ -47,6 +44,19 @@ El proyecto no utiliza frameworks (React, Angular, Vue), lo que facilita su desp
     └── popups.js           # Configuración de popups por capa
 
 ```
+---
+
+🎨 Customización
+
+Se puede customizar fácilmente:
+
+- Identidad visual (colores, tipografías, logos)
+- Títulos, textos y nombres del sistema
+- Capas y estilos cartográficos
+- Popups (campos visibles por capa)
+- Mapas base disponibles
+- Consumo de servicios WMS / WFS
+
 ---
 
 ## ▶️ Ejecución del proyecto en entorno local
@@ -103,13 +113,12 @@ Los popups se configuran por capa mediante un archivo de configuración (popups/
 
 ## 📌 Estado del proyecto
 
-Prototipo funcional.
-En desarrollo / evolución.
-Arquitectura preparada para incorporar nuevas capas, estilos y funcionalidades.
-
+🟡 En desarrollo activo
+🧱 Base funcional estable
+🚀 Preparado para ampliación y profesionalización
 
 ## 👤 Autor / Desarrollo
 
-Proyecto desarrollado como prototipo de visor geográfico municipal de base para futuros desarrollos institucionales.
-Ing. Agrim. Lucila L. Piedrabuena - Producto de Borde.
+Ing. Agrim. Lucila L. Piedrabuena
+www.linkedin.com/in/llpagrimensura
 
