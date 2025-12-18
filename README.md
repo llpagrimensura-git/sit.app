@@ -1,9 +1,8 @@
 # Sistema de Información Territorial
 
-**sit.app** es un Sistema de Información Territorial web de información geográfica orientado a la visualización, consulta y gestión de capas geoespaciales en formato **GeoJSON**, utilizando **OpenLayers** como motor de mapas. El proyecto está orientado organismos públicos, municipios y comunas, consultoras, proyectos academicos y equipos técnicos. El sistema permite construir visores cartográficos modernos, responsivos y escalables, integrando datos geográficos provenientes de múltiples fuentes y facilitando su uso en procesos de gestión, planificación y análisis territorial.
+**sit.app** es una aplicación web estática, sin backend, que se despliega copiando archivos en una carpeta pública del servidor, orientado a la visualización, consulta y gestión de capas geoespaciales en formato **GeoJSON**, utilizando **OpenLayers** como motor de mapas. El proyecto está orientado organismos públicos, municipios y comunas, consultoras, proyectos academicos y equipos técnicos. El sistema permite construir visores cartográficos modernos, responsivos y escalables, integrando datos geográficos provenientes de múltiples fuentes y facilitando su uso en procesos de gestión, planificación y análisis territorial.
 
 ---
-
 ## 🗺️ Funcionalidades principales
 
 - Visualización de mapa base OpenStreetMap.
@@ -17,7 +16,6 @@
 - Diseño responsive básico.
 
 ---
-
 ## 🧱 Tecnologías utilizadas
 
 - Frontend: **HTML5, CSS3, JavaScript**
@@ -28,12 +26,13 @@
 El proyecto no utiliza frameworks (React, Angular, Vue), lo que facilita su despliegue en entornos simples y servidores institucionales.
 
 ---
-
 ## 📁 Estructura del proyecto
 
 ```text
 
 ├── index.html              # Archivo principal del visor
+├── assets/
+│   └── img/*.svg           # Logo institucional 
 ├── layers/
 │   ├── layers.json         # Definición de capas (archivo, nombre, descripción)
 │   └── *.geojson           # Capas vectoriales
@@ -45,7 +44,6 @@ El proyecto no utiliza frameworks (React, Angular, Vue), lo que facilita su desp
 
 ```
 ---
-
 🎨 Customización
 
 Se puede customizar fácilmente:
@@ -58,7 +56,6 @@ Se puede customizar fácilmente:
 - Consumo de servicios WMS / WFS
 
 ---
-
 ## ▶️ Ejecución del proyecto en entorno local
 
 ### 1️⃣ Abrir una terminal (CMD / PowerShell)
@@ -80,7 +77,6 @@ python -m http.server 8080
 http://localhost:8080 o http://localhost:8080/index.html
 
 ---
-
 ## 🧩 Agregar una nueva capa GeoJSON
 
 1. Copiar el archivo .geojson dentro de la carpeta layers/.
@@ -99,7 +95,6 @@ http://localhost:8080 o http://localhost:8080/index.html
 Al recargar el visor, la nueva capa aparecerá automáticamente en el panel de capas.
 
 ---
-
 ## 💬 Popups de información
 
 Los popups se configuran por capa mediante un archivo de configuración (popups/popups.js), permitiendo:
@@ -110,13 +105,30 @@ Los popups se configuran por capa mediante un archivo de configuración (popups/
 - Esto permite mostrar información clara y relevante al usuario final.
 
 ---
+## ⚙️ Requisitos técnicos
 
+Servidor web (Apache, Nginx o equivalente)
+Acceso a una carpeta pública del servidor
+HTTPS habilitado (Ejemplo: https://institucion.com.ar/sit)
+Navegador web moderno (Chrome, Firefox, Edge)
+
+📌 No se requieren bases de datos ni servicios adicionales.
+
+---
+## 🔄 Actualizaciones
+
+1. Reemplazar los archivos correspondientes en la carpeta /sit
+2. Mantener la estructura original
+3. Limpiar caché del navegador si es necesario
+
+---
 ## 📌 Estado del proyecto
 
 🟡 En desarrollo activo
 🧱 Base funcional estable
 🚀 Preparado para ampliación y profesionalización
 
+---
 ## 👤 Autor / Desarrollo
 
 Ing. Agrim. Lucila L. Piedrabuena
