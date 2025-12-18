@@ -50,16 +50,23 @@
         gap: 12px;
       }
 
-      header .title-block span.logo {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: rgba(220, 220, 220);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-      }
+   header .title-block span.logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(220, 220, 220);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 👈 importante para el SVG */
+}
+
+header .title-block span.logo img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+}
 
       header h1 {
         font-size: 18px;
@@ -182,6 +189,7 @@
       #map {
         width: 100%;
         height: 100%;
+		position: relative; /* 👈 CLAVE */
         }
 
       /* Pop-up de qgis2web */
@@ -210,8 +218,23 @@
       .layer-switcher li {
         margin-bottom: 4px;
       }
-	  
-//POP UP		
+
+/* regla */
+.map-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 2000;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+	
 /* Contenedor principal del popup */
 .ol-popup {
   position: absolute;
@@ -260,6 +283,12 @@
   color: #172b4d;
 }
 
+.popup-coords {
+  font-size: 10px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
 /* Flechita tipo nube */
 .popup-bubble::after {
   content: '';
@@ -281,7 +310,6 @@
   transition: width 0.3s ease;
   overflow: hidden;
 }
-
 
 /* Ocultos */
 #sidebar-left.collapsed {
@@ -390,7 +418,7 @@
       <header>
         <div class="title-block">
 			<span class="logo">
-					🌎
+				<img src="assets/img/logo.svg" alt="sit.app" />
 			</span>		
           <div>
             <h1>sit.app</h1>
@@ -412,8 +440,6 @@
 
 <!-- BOTÓN PANEL DERECHO -->
 <button class="toggle-btn right" id="toggle-right" title="Herramientas">❮</button>
-
-
 
       <!-- SIDEBAR IZQUIERDA: CAPAS -->
       <aside id="sidebar-left">
@@ -439,13 +465,18 @@
 
       <!-- MAPA -->
       <main id="map-container">
-        <div id="map">
-          <div id="popup" class="ol-popup">
-            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content"></div>
-          </div>
-        </div>
-      </main>
+		<div id="map">
+
+  <div id="popup" class="ol-popup">
+			<a href="#" id="popup-closer" class="ol-popup-closer"></a>
+			<div id="popup-content"></div>
+			</div>
+
+			<!-- ✅ BOTÓN DE MEDICIÓN -->
+			<button id="btn-measure" class="map-btn" title="Medir distancia">📏</button>
+
+			</div>
+	</main>
 
       <!-- SIDEBAR DERECHA: HERRAMIENTAS -->
       <aside id="sidebar-right">
@@ -526,7 +557,6 @@ document.getElementById('basemap-select').addEventListener('change', function ()
   baseLayers[selected].setVisible(true);
 });
 
-
 			// MAPA
 	var map = new ol.Map({
 		target: 'map',
@@ -539,6 +569,92 @@ document.getElementById('basemap-select').addEventListener('change', function ()
 			});
 
 const geojsonLayers = {};
+
+// HERRAMIENTA DE MEDICION
+
+let measureInteraction;
+let measureTooltip;
+let measureTooltipElement;
+
+function createMeasureTooltip() {
+  if (measureTooltipElement) {
+    measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+  }
+
+  measureTooltipElement = document.createElement('div');
+  measureTooltipElement.className = 'measure-tooltip';
+
+  measureTooltip = new ol.Overlay({
+    element: measureTooltipElement,
+    offset: [0, -15],
+    positioning: 'bottom-center'
+  });
+
+  map.addOverlay(measureTooltip);
+}
+
+function formatLength(geometry) {
+  const length = ol.sphere.getLength(geometry);
+  return length > 1000
+    ? (length / 1000).toFixed(2) + ' km'
+    : length.toFixed(2) + ' m';
+}
+
+document.getElementById('btn-measure').addEventListener('click', () => {
+
+  if (measureInteraction) return;
+
+  createMeasureTooltip();
+
+  measureInteraction = new ol.interaction.Draw({
+    source: new ol.source.Vector(),
+    type: 'LineString'
+  });
+
+  map.addInteraction(measureInteraction);
+
+  measureInteraction.on('drawstart', function (evt) {
+    const sketch = evt.feature;
+
+    sketch.getGeometry().on('change', function (e) {
+      const geom = e.target;
+      const output = formatLength(geom);
+
+      measureTooltipElement.innerHTML = output;
+      measureTooltip.setPosition(geom.getLastCoordinate());
+    });
+  });
+
+  measureInteraction.on('drawend', function () {
+    map.removeInteraction(measureInteraction);
+    measureInteraction = null;
+
+    map.removeOverlay(measureTooltip);
+    measureTooltipElement = null;
+  });
+});
+
+// ========================
+// CARGA DE WMS PROVINCIAL
+// ========================
+
+const wmsProvincia = new ol.layer.Image({
+  title: 'Manzanas IPEC (Provincia)',
+  visible: false,
+  source: new ol.source.ImageWMS({
+    url: 'https://aswe.santafe.gov.ar/idesf/wms',
+    params: {
+      'LAYERS': 'ipec_manzanas_prov',
+      'VERSION': '1.1.1',
+      'FORMAT': 'image/png',
+      'TRANSPARENT': true
+    },
+    serverType: 'geoserver'
+   })
+});
+
+addLayerToPanel('Manzanas (IDESF)', wmsProvincia);
+map.addLayer(wmsProvincia);
 
 // ========================
 // CARGA DE CAPAS GEOJSON
@@ -565,7 +681,7 @@ async function loadGeoJSONLayers() {
 	layer.set('layerKey', item.file.replace('.geojson', ''));
 
     map.addLayer(layer);
-
+	
     // 🔥 ESTO ES LO QUE FALTABA / FALLABA
     geojsonLayers[item.name] = layer;
 
@@ -586,13 +702,18 @@ const overlay = new ol.Overlay({
 map.addOverlay(overlay);
 
 map.on('singleclick', function (evt) {
+
+	const coordinate = evt.coordinate;
+	const lonLat = ol.proj.toLonLat(coordinate);
+
   let found = false;
 
   map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
     const layerKey = layer.get('layerKey');
     if (!layerKey) return;
 
-    const html = buildPopupContent(feature, layerKey);
+    const html = buildPopupContent(feature, layerKey,lonLat);
+		overlay.setPosition(coordinate);
     if (!html) return;
 
     document.getElementById('popup-content').innerHTML = html;
@@ -666,7 +787,7 @@ function populateFilterLayers() {
 
   const placeholder = document.createElement('option');
   placeholder.value = '';
-  placeholder.textContent = 'Seleccione una capa';
+  placeholder.textContent = 'Seleccione una capa filtrable';
   select.appendChild(placeholder);
 
   Object.keys(geojsonLayers).forEach(name => {
@@ -918,13 +1039,18 @@ btnGeolocate.addEventListener('click', function () {
 
 // popup contenido de la capa
 
-function buildPopupContent(feature, layerKey) {
+function buildPopupContent(feature, layerKey, lonLat) {
   const config = popupConfig[layerKey];
   if (!config) return null;
 
-  let html = `<div class="popup-bubble">`;
-  html += `<div class="popup-title">${config.title}</div>`;
-  html += `<table class="popup-table">`;
+  let html = `
+    <div class="popup-bubble">
+      <div class="popup-coords">
+        Lon: ${lonLat[0].toFixed(5)} | Lat: ${lonLat[1].toFixed(5)}
+      </div>
+      <div class="popup-title">${config.title}</div>
+      <table class="popup-table">
+  `;
 
   config.fields.forEach(field => {
     const value = feature.get(field.key);
@@ -938,9 +1064,14 @@ function buildPopupContent(feature, layerKey) {
     }
   });
 
-  html += `</table></div>`;
+  html += `
+      </table>
+    </div>
+  `;
+
   return html;
 }
+
 
     </script>
   </body>
