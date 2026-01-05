@@ -12,312 +12,84 @@
 
     <!-- Estilos personalizados (mockup estilo “app”) -->
     <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-        background: #f5f7fb;
-      }
+  /* =========================================================
+   BASE / RESET
+   ========================================================= */
 
-      /* Layout general: header arriba, 3 columnas abajo */
-      #app {
-        display: grid;
-        grid-template-rows: 64px auto;
-        grid-template-columns: 280px auto 320px;
-        grid-template-areas:
-          "header header header"
-          "sidebar-left map sidebar-right";
-        width: 100%;
-        height: 100%;
-      }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: #f5f7fb;
+}
 
-      header {
-        grid-area: header;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
-        background: linear-gradient(90deg, #016B91, #ED8153);
-        color: #ffffff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      }
+/* =========================================================
+   LAYOUT GENERAL (BASE)
+   ========================================================= */
 
-      header .title-block {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
+#app {
+  display: grid;
+  grid-template-rows: 64px auto;
+  grid-template-columns: 280px auto 320px;
+  grid-template-areas:
+    "header header header"
+    "sidebar-left map sidebar-right";
+  width: 100%;
+  height: 100%;
+}
 
-   header .title-block span.logo {
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(90deg, #016B91, #ED8153);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 30;
+}
+
+header .title-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+header .subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Logo */
+header .title-block span.logo {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(220, 220, 220);
+  background: rgba(220,220,220);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden; /* 👈 importante para el SVG */
+  overflow: hidden;
 }
 
 header .title-block span.logo img {
   width: 80%;
   height: 80%;
   object-fit: contain;
-  pointer-events: none;
 }
 
-      header h1 {
-        font-size: 18px;
-        margin: 0;
-      }
-
-      header .subtitle {
-        font-size: 12px;
-        opacity: 0.8;
-      }
-
-      /* Panel izquierdo: capas */
-      #sidebar-left {
-        grid-area: sidebar-left;
-        padding: 16px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      /* Panel derecho: herramientas */
-      #sidebar-right {
-        grid-area: sidebar-right;
-        padding: 16px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      /* Tarjetas / paneles internos */
-      .card {
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 12px 14px;
-        box-shadow: 0 4px 10px rgba(15,27,40,0.08);
-        box-sizing: border-box;
-      }
-
-      .card h3 {
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #22314a;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .card h3 .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: #2ecc71;
-      }
-
-      .card small {
-        font-size: 11px;
-        color: #7a869a;
-      }
-
-      label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #42526e;
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      input[type="text"], select {
-        width: 100%;
-        padding: 6px 8px;
-        font-size: 12px;
-        border-radius: 8px;
-        border: 1px solid #d0d4e4;
-        box-sizing: border-box;
-        outline: none;
-      }
-
-      input[type="text"]:focus, select:focus {
-        border-color: #0074d9;
-        box-shadow: 0 0 0 2px rgba(0,116,217,0.15);
-      }
-
-      button.btn {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 8px;
-        border: none;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        background: #016B91;
-        color: #ffffff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-      }
-
-      button.btn.secondary {
-        background: #ffffff;
-        color: #016B91;
-        border: 1px solid #d0d4e4;
-      }
-
-      button.btn:hover {
-        filter: brightness(1.05);
-      }
-
-      /* Contenedor del mapa */
-      #map-container {
-			grid-area: map;
-			position: relative;
-			padding: 0;
-			height: calc(100vh - 64px); /* alto total menos header */
-      }
-
-      #map {
-        width: 100%;
-        height: 100%;
-		position: relative; /* 👈 CLAVE */
-        }
-
-      /* Pop-up de qgis2web */
-      .ol-popup {
-        font-size: 12px;
-      }
-
-      /* Ajuste de controles OL al estilo UI */
-      .ol-control {
-        background-color: rgba(255,255,255,0.9)!important;
-        border-radius: 8px!important;
-        padding: 4px!important;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        margin-top: 80px!important; /* los bajamos un poco para que no choquen con el header */
-      }
-
-      .ol-zoom, .ol-rotate {
-        right: 24px!important;
-        left: auto!important;
-      }
-
-      /* Layer switcher original de qgis2web; lo adaptamos visualmente */
-      .layer-switcher {
-        font-size: 12px;
-      }
-      .layer-switcher li {
-        margin-bottom: 4px;
-      }
-
-/* ===============================
-   CONTROLES MAPA (ZOOM + REGLA)
-   =============================== */
-
-/* Contenedor de controles del mapa */
-.map-controls {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 2000;
-}
-
-/* Botones */
-.map-btn {
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Hover */
-.map-btn:hover {
-  background: #f0f0f0;
-}
-	
-/* Contenedor principal del popup */
-.ol-popup {
-  position: absolute;
-  background: transparent;
-  padding: 0;
-  border: none;
-  bottom: 12px;
-  left: -50%;
-}
-
-/* Burbuja blanca */
-.popup-bubble {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 10px 12px;
-  min-width: 180px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  font-size: 12px;
-  color: #22314a;
-}
-
-/* Título */
-.popup-title {
-  font-weight: 700;
-  font-size: 13px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid #e6e9ef;
-  padding-bottom: 4px;
-}
-
-/* Tabla */
-.popup-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.popup-label {
-  font-weight: 600;
-  padding-right: 6px;
-  color: #42526e;
-  vertical-align: top;
-  white-space: nowrap;
-}
-
-.popup-value {
-  color: #172b4d;
-}
-
-.popup-coords {
-  font-size: 10px;
-  color: #6b7280;
-  margin-bottom: 6px;
-}
-
-/* Flechita tipo nube */
-.popup-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 8px 8px 0 8px;
-  border-style: solid;
-  border-color: #ffffff transparent transparent transparent;
-}
 
 /* Contenedor del ícono */
 .info-wrapper {
@@ -367,181 +139,256 @@ header .title-block span.logo img {
   transform: translateY(0);
 }
 
-/* =======================
-   PANELES COLAPSABLES
-   ======================= */
 
-/* 🔥 IMPORTANTE: en mobile los paneles SIEMPRE tienen ancho */
-#sidebar-left,
-#sidebar-right {
-  width: 280px !important;
-  padding: 16px !important;
-}
-
-/* DERECHO visible */
-#sidebar-right {
-  right: 0;
-  transform: translateX(100%);
-}
-
-/* DERECHO oculto */
-#sidebar-right.collapsed {
-  transform: translateX(100%);
-}
-
-/* DERECHO abierto */
-#sidebar-right:not(.collapsed) {
-  transform: translateX(0);
-}
+/* =========================================================
+   SIDEBARS (BASE)
+   ========================================================= */
 
 #sidebar-left {
-  left: 0;
-  transform: translateX(0);
+  grid-area: sidebar-left;
 }
 
-#sidebar-left.collapsed {
-  transform: translateX(-100%);
+#sidebar-right {
+  grid-area: sidebar-right;
 }
 
+#sidebar-left,
+#sidebar-right {
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-/* Botones */
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 10px rgba(15,27,40,0.08);
+  box-sizing: border-box;
+}
+
+.card h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #22314a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card h3 .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #2ecc71;
+}
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #42526e;
+  display: block;
+  margin-bottom: 4px;
+}
+
+input[type="text"], select {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #d0d4e4;
+  box-sizing: border-box;
+}
+
+button.btn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #016B91;
+  color: #ffffff;
+}
+
+button.btn.secondary {
+  background: #ffffff;
+  color: #016B91;
+  border: 1px solid #d0d4e4;
+}
+
+/* =========================================================
+   MAPA
+   ========================================================= */
+
+#map-container {
+  grid-area: map;
+  position: relative;
+  height: calc(100vh - 64px);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* =========================================================
+   CONTROLES DEL MAPA
+   ========================================================= */
+
+.map-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2000;
+}
+
+.map-btn {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   SUBTÍTULOS
+   ========================================================= */
+
+.layer-subtitle {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  padding-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #7a869a;
+  border-top: 1px solid #e6e9ef;
+}
+
+/* =========================================================
+   BOTONES DE COLAPSO
+   ========================================================= */
+
 .toggle-btn {
   position: absolute;
-  top: 80px; /* debajo del header */
+  top: 80px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
   border: none;
-  cursor: pointer;
   background: #016B91;
   color: #fff;
-  font-size: 14px;
+  cursor: pointer;
   z-index: 50;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* Botón izquierdo */
-.toggle-btn.left {
-  left: 280px;
+/* =========================================================
+   DESKTOP (GRID DINÁMICO)
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+  #sidebar-left,
+  #sidebar-right {
+    position: static;
+    transform: none;
+  }
+
+  #app.left-collapsed {
+    grid-template-columns: 0 auto 320px;
+  }
+
+  #app.right-collapsed {
+    grid-template-columns: 280px auto 0;
+  }
+
+  #app.both-collapsed {
+    grid-template-columns: 0 auto 0;
+  }
+
+  .toggle-btn.left { left: 280px; }
+  .toggle-btn.right { right: 320px; }
+
+  #app.left-collapsed .toggle-btn.left { left: 0; }
+  #app.right-collapsed .toggle-btn.right { right: 0; }
 }
 
-/* Botón derecho */
-.toggle-btn.right {
-  right: 320px;
-}
+/* =========================================================
+   MOBILE (OVERLAY)
+   ========================================================= */
 
-/* Cuando están colapsados */
-#app.left-collapsed .toggle-btn.left {
-  left: 0;
-}
-
-#app.right-collapsed .toggle-btn.right {
-  right: 0;
-}
-
-#app.left-collapsed {
-  grid-template-columns: 0 auto 320px;
-}
-
-#app.right-collapsed {
-  grid-template-columns: 280px auto 0;
-}
-
-#app.both-collapsed {
-  grid-template-columns: 0 auto 0;
-}
-
-
-      /* Responsive básico */
 @media (max-width: 900px) {
 
-header {
-  position: relative;
-  z-index: 30;
-}
-
-#map-container {
-  height: calc(100vh - 64px);
-  min-height: calc(100vh - 64px);
-}
-
-#map {
-  height: 100%;
-  min-height: 100%;
-}
-
-
-  /* Layout general */
-  
   #app {
-  min-height: 100vh;
-}
-  #app {
-    grid-template-rows: 64px auto;
+    min-height: 100vh;
     grid-template-columns: 100%;
     grid-template-areas:
       "header"
       "map";
   }
 
-  /* Paneles como overlay */
   #sidebar-left,
   #sidebar-right {
     position: absolute;
     top: 64px;
     height: calc(100% - 64px);
     width: 280px;
-    z-index: 20;
     background: #f5f7fb;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: transform 0.3s ease;
+    z-index: 20;
   }
 
-  /* IZQUIERDO visible por defecto */
   #sidebar-left {
     left: 0;
-    transform: translateX(0);
+    transform: translateX(-100%);
   }
 
-  /* DERECHO oculto por defecto */
   #sidebar-right {
     right: 0;
     transform: translateX(100%);
   }
 
-  /* Estados colapsados */
-  #sidebar-left.collapsed {
-    transform: translateX(-100%);
+  #sidebar-left:not(.collapsed),
+  #sidebar-right:not(.collapsed) {
+    transform: translateX(0);
   }
 
-  #sidebar-right.collapsed {
-    transform: translateX(100%);
-  }
-
-  /* Botones más cómodos en mobile */
   .toggle-btn {
     top: 72px;
   }
 
-  .toggle-btn.left {
-    left: 8px;
+  .toggle-btn.left { left: 8px; }
+  .toggle-btn.right { right: 8px; }
+
+  /* Ocultar controles si hay panel abierto */
+  #app.panel-open .map-controls {
+    display: none;
   }
-
-  .toggle-btn.right {
-    right: 8px;
+  
+    .map-controls {
+    bottom: 15px;
   }
-}
-
-/* En mobile el grid NO cambia */
-#app.left-collapsed,
-#app.right-collapsed,
-#app.both-collapsed {
-  grid-template-columns: 100% !important;
-}
-
-/* Cuando hay panel abierto, ocultar controles del mapa */
-#app:not(.both-collapsed) .map-controls {
-  display: none;
+  
 }
 
     </style>
@@ -560,6 +407,7 @@ header {
             <div class="subtitle">Sistema de Información Territorial</div>
           </div>
         </div>
+ 
  <div class="info-wrapper">
   <button class="info-btn" aria-label="Información">ℹ️</button>
 
@@ -569,8 +417,8 @@ header {
       LLP
     </a>
   </div>
-</div>
-      </header>
+
+ </header>
 
 <!-- BOTÓN PANEL IZQUIERDO -->
 <button class="toggle-btn left" id="toggle-left" title="Capas">❯</button>
@@ -587,6 +435,13 @@ header {
           <div id="layer-tree">
             <!-- Aquí se moverá el control .layer-switcher existente -->
           </div>
+		  <div class="layer-subtitle">
+			Capas WMS 🌐
+		</div>
+
+<div id="layer-tree-external">
+  <!-- Capas WMS / provinciales -->
+</div>
         </section>
       
 	  <!-- Card de capas base -->
@@ -792,7 +647,11 @@ const wmsProvincia = new ol.layer.Image({
    })
 });
 
-addLayerToPanel('Manzanas (IDESF)', wmsProvincia);
+addLayerToPanel(
+  'Manzanas IDESF',
+  wmsProvincia,
+  'layer-tree-external'
+);
 map.addLayer(wmsProvincia);
 
 // ========================
@@ -911,18 +770,33 @@ btnRight.addEventListener('click', () => {
 function updateLayout() {
   const left = sidebarLeft.classList.contains('collapsed');
   const right = sidebarRight.classList.contains('collapsed');
+  const isMobile = window.innerWidth <= 900;
 
-  app.classList.toggle('left-collapsed', left);
-  app.classList.toggle('right-collapsed', right);
-  app.classList.toggle('both-collapsed', left && right);
+  if (!isMobile) {
+    app.classList.toggle('left-collapsed', left);
+    app.classList.toggle('right-collapsed', right);
+    app.classList.toggle('both-collapsed', left && right);
+    app.classList.remove('panel-open');
+  } else {
+    app.classList.remove('left-collapsed', 'right-collapsed', 'both-collapsed');
 
+    if (!left || !right) {
+      app.classList.add('panel-open');
+    } else {
+      app.classList.remove('panel-open');
+    }
+  
   btnLeft.textContent = left ? '❯' : '❮';
   btnRight.textContent = right ? '❮' : '❯';
 
-  // 🔥 CLAVE para que el mapa se expanda
-  setTimeout(() => {
+  requestAnimationFrame(() => map.updateSize());
+}
+
+
+  // 🔄 Recalcular mapa SIEMPRE
+  requestAnimationFrame(() => {
     map.updateSize();
-  }, 310);
+  });
 }
 
 // ========================
@@ -1047,22 +921,25 @@ document.getElementById('btn-clear-filter').addEventListener('click', () => {
 });
 
 // agrega un checkbox en el panel izquierdo
-function addLayerToPanel(name, layer) {
+
+function addLayerToPanel(name, layer, containerId = 'layer-tree') {
   const id = `chk-${name}`;
   const div = document.createElement('div');
+
   div.innerHTML = `
     <label style="font-size:13px;">
       <input type="checkbox" id="${id}" checked>
       ${name}
     </label>
   `;
-  document.getElementById('layer-tree').appendChild(div);
+
+  document.getElementById(containerId).appendChild(div);
 
   document.getElementById(id).addEventListener('change', function () {
     layer.setVisible(this.checked);
-	
   });
 }
+
 
 window.addEventListener('load', () => {
   loadGeoJSONLayers();
