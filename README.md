@@ -65,7 +65,7 @@ Se puede customizar fácilmente:
 Ejemplo:
 
 ```bat
-cd Desktop\sti.app
+cd Desktop\sit.app
 ```
 
 ### 3️⃣ Levantar un servidor HTTP local
