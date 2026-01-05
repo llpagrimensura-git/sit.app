@@ -219,12 +219,23 @@ header .title-block span.logo img {
         margin-bottom: 4px;
       }
 
-/* regla */
-.map-btn {
+/* ===============================
+   CONTROLES MAPA (ZOOM + REGLA)
+   =============================== */
+
+/* Contenedor de controles del mapa */
+.map-controls {
   position: absolute;
   bottom: 12px;
   right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   z-index: 2000;
+}
+
+/* Botones */
+.map-btn {
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -232,8 +243,15 @@ header .title-block span.logo img {
   height: 36px;
   cursor: pointer;
   font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Hover */
+.map-btn:hover {
+  background: #f0f0f0;
+}
 	
 /* Contenedor principal del popup */
 .ol-popup {
@@ -301,26 +319,90 @@ header .title-block span.logo img {
   border-color: #ffffff transparent transparent transparent;
 }
 
+/* Contenedor del ícono */
+.info-wrapper {
+  position: relative;
+}
+
+/* Botón info */
+.info-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 4px;
+}
+
+/* Tooltip */
+.info-tooltip {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background: #ffffff;
+  color: #22314a;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+}
+
+.info-tooltip a {
+  color: #016B91;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Mostrar tooltip */
+.info-wrapper:hover .info-tooltip,
+.info-wrapper:focus-within .info-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
 /* =======================
    PANELES COLAPSABLES
    ======================= */
 
+/* 🔥 IMPORTANTE: en mobile los paneles SIEMPRE tienen ancho */
 #sidebar-left,
 #sidebar-right {
-  transition: width 0.3s ease;
-  overflow: hidden;
+  width: 280px !important;
+  padding: 16px !important;
 }
 
-/* Ocultos */
-#sidebar-left.collapsed {
-  width: 0 !important;
-  padding: 0;
+/* DERECHO visible */
+#sidebar-right {
+  right: 0;
+  transform: translateX(100%);
 }
 
+/* DERECHO oculto */
 #sidebar-right.collapsed {
-  width: 0 !important;
-  padding: 0;
+  transform: translateX(100%);
 }
+
+/* DERECHO abierto */
+#sidebar-right:not(.collapsed) {
+  transform: translateX(0);
+}
+
+#sidebar-left {
+  left: 0;
+  transform: translateX(0);
+}
+
+#sidebar-left.collapsed {
+  transform: translateX(-100%);
+}
+
 
 /* Botones */
 .toggle-btn {
@@ -373,6 +455,27 @@ header .title-block span.logo img {
       /* Responsive básico */
 @media (max-width: 900px) {
 
+header {
+  position: relative;
+  z-index: 30;
+}
+
+#map-container {
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+}
+
+#map {
+  height: 100%;
+  min-height: 100%;
+}
+
+
+  /* Layout general */
+  
+  #app {
+  min-height: 100vh;
+}
   #app {
     grid-template-rows: 64px auto;
     grid-template-columns: 100%;
@@ -381,6 +484,7 @@ header .title-block span.logo img {
       "map";
   }
 
+  /* Paneles como overlay */
   #sidebar-left,
   #sidebar-right {
     position: absolute;
@@ -389,17 +493,23 @@ header .title-block span.logo img {
     width: 280px;
     z-index: 20;
     background: #f5f7fb;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: transform 0.3s ease;
   }
 
+  /* IZQUIERDO visible por defecto */
   #sidebar-left {
     left: 0;
+    transform: translateX(0);
   }
 
+  /* DERECHO oculto por defecto */
   #sidebar-right {
     right: 0;
+    transform: translateX(100%);
   }
 
+  /* Estados colapsados */
   #sidebar-left.collapsed {
     transform: translateX(-100%);
   }
@@ -407,6 +517,31 @@ header .title-block span.logo img {
   #sidebar-right.collapsed {
     transform: translateX(100%);
   }
+
+  /* Botones más cómodos en mobile */
+  .toggle-btn {
+    top: 72px;
+  }
+
+  .toggle-btn.left {
+    left: 8px;
+  }
+
+  .toggle-btn.right {
+    right: 8px;
+  }
+}
+
+/* En mobile el grid NO cambia */
+#app.left-collapsed,
+#app.right-collapsed,
+#app.both-collapsed {
+  grid-template-columns: 100% !important;
+}
+
+/* Cuando hay panel abierto, ocultar controles del mapa */
+#app:not(.both-collapsed) .map-controls {
+  display: none;
 }
 
     </style>
@@ -425,13 +560,15 @@ header .title-block span.logo img {
             <div class="subtitle">Sistema de Información Territorial</div>
           </div>
         </div>
-        <div style="font-size:12px;opacity:0.8;">
-  DEMO desarrollado por 
-  <a href="https://www.linkedin.com/in/llpagrimensura" 
-     target="_blank" 
-     style="color:#ffffff;text-decoration:underline;">
-    LLP
-  </a>
+ <div class="info-wrapper">
+  <button class="info-btn" aria-label="Información">ℹ️</button>
+
+  <div class="info-tooltip">
+    DEMO desarrollado por
+    <a href="https://www.linkedin.com/in/llpagrimensura" target="_blank">
+      LLP
+    </a>
+  </div>
 </div>
       </header>
 
@@ -471,8 +608,10 @@ header .title-block span.logo img {
 			<a href="#" id="popup-closer" class="ol-popup-closer"></a>
 			<div id="popup-content"></div>
 			</div>
-
+			<div class="map-controls">
 			<!-- ✅ BOTÓN DE MEDICIÓN -->
+			<button id="btn-zoom-in" class="map-btn" title="Acercar">＋</button>
+			<button id="btn-zoom-out" class="map-btn" title="Alejar">－</button>
 			<button id="btn-measure" class="map-btn" title="Medir distancia">📏</button>
 
 			</div>
@@ -664,31 +803,30 @@ async function loadGeoJSONLayers() {
   const response = await fetch('layers/layers.json');
   const files = await response.json();
 
-  files.forEach(item => {
-    const layerKey = item.file.replace('.geojson', '');
-    const styleFn = getLayerStyle(layerKey);
+  files
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+    .forEach(item => {
 
-    const source = new ol.source.Vector({
-      url: `layers/${item.file}`,
-      format: new ol.format.GeoJSON()
+      const layerKey = item.file.replace('.geojson', '');
+      const styleFn = getLayerStyle(layerKey);
+
+      const source = new ol.source.Vector({
+        url: `layers/${item.file}`,
+        format: new ol.format.GeoJSON()
+      });
+
+      const layer = new ol.layer.Vector({
+        source: source,
+        style: styleFn || defaultVectorStyle
+      });
+
+      layer.set('layerKey', layerKey);
+      map.addLayer(layer);
+
+      geojsonLayers[item.name] = layer;
+      addLayerToPanel(item.name, layer);
     });
 
-    const layer = new ol.layer.Vector({
-      source: source,
-      style: styleFn || defaultVectorStyle
-    });
-	
-	layer.set('layerKey', item.file.replace('.geojson', ''));
-
-    map.addLayer(layer);
-	
-    // 🔥 ESTO ES LO QUE FALTABA / FALLABA
-    geojsonLayers[item.name] = layer;
-
-    addLayerToPanel(item.name, layer);
-  });
-
-  // 🔥 SOLO ACÁ se llena el select
   populateFilterLayers();
 }
 
@@ -732,6 +870,23 @@ document.getElementById('popup-closer').onclick = function () {
   overlay.setPosition(undefined);
   return false;
 };
+
+document.getElementById('btn-zoom-in').addEventListener('click', () => {
+  const view = map.getView();
+  view.animate({
+    zoom: view.getZoom() + 1,
+    duration: 200
+  });
+});
+
+document.getElementById('btn-zoom-out').addEventListener('click', () => {
+  const view = map.getView();
+  view.animate({
+    zoom: view.getZoom() - 1,
+    duration: 200
+  });
+});
+
 
 // ========================
 // Paneles colapsables
@@ -911,6 +1066,14 @@ function addLayerToPanel(name, layer) {
 
 window.addEventListener('load', () => {
   loadGeoJSONLayers();
+
+ // 🔹 Estado inicial en responsive: sin paneles abiertos
+  if (window.innerWidth <= 900) {
+    sidebarLeft.classList.add('collapsed');
+    sidebarRight.classList.add('collapsed');
+    updateLayout();
+  }
+  
 });
 
 // ========================
@@ -1071,7 +1234,6 @@ function buildPopupContent(feature, layerKey, lonLat) {
 
   return html;
 }
-
 
     </script>
   </body>
