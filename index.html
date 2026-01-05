@@ -32,7 +32,7 @@ html, body {
 #app {
   display: grid;
   grid-template-rows: 64px auto;
-  grid-template-columns: 280px auto 320px;
+  grid-template-columns: 280px 1fr 320px;
   grid-template-areas:
     "header header header"
     "sidebar-left map sidebar-right";
@@ -233,16 +233,14 @@ button.btn.secondary {
    MAPA
    ========================================================= */
 
-#map-container {
-  grid-area: map;
-  position: relative;
-  height: calc(100vh - 64px);
+#map-container{
+  width: 100%;
+  min-width: 0;   /* 🔥 CLAVE */
 }
 
 #map {
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
 /* =========================================================
@@ -301,61 +299,147 @@ button.btn.secondary {
   z-index: 50;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 /* =========================================================
-   DESKTOP (GRID DINÁMICO)
+   DESKTOP (GRID DINÁMICO LIMPIO)
    ========================================================= */
 
 @media (min-width: 901px) {
 
+  /* Layout base desktop */
+  #app {
+    grid-template-rows: 64px 1fr;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-areas:
+      "header header header"
+      "sidebar-left map sidebar-right";
+  }
+
+  /* Sidebars dentro del grid (NO overlay) */
   #sidebar-left,
   #sidebar-right {
     position: static;
+    height: auto;
+    width: auto;
+    min-width: 0;
+    padding: 16px;
+    overflow: auto;
     transform: none;
+    background: #f5f7fb;
   }
 
+  /* ====== COLAPSO POR GRID ====== */
+
+  /* Izquierdo colapsado */
   #app.left-collapsed {
-    grid-template-columns: 0 auto 320px;
+    grid-template-columns: 0 1fr 320px;
   }
 
+  /* Derecho colapsado */
   #app.right-collapsed {
-    grid-template-columns: 280px auto 0;
+    grid-template-columns: 280px 1fr 0;
   }
 
+  /* Ambos colapsados */
   #app.both-collapsed {
-    grid-template-columns: 0 auto 0;
+    grid-template-columns: 0 1fr 0;
   }
 
-  .toggle-btn.left { left: 280px; }
-  .toggle-btn.right { right: 320px; }
+  /* Colapso REAL de paneles */
+  #app.left-collapsed #sidebar-left,
+  #app.right-collapsed #sidebar-right,
+  #app.both-collapsed #sidebar-left,
+  #app.both-collapsed #sidebar-right {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
 
-  #app.left-collapsed .toggle-btn.left { left: 0; }
-  #app.right-collapsed .toggle-btn.right { right: 0; }
+  /* ====== MAPA ====== */
+
+  #map-container {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+  }
+
+  /* ====== BOTONES DE PANEL ====== */
+
+  .toggle-btn {
+    top: 72px;
+  }
+
+  .toggle-btn.left {
+    left: 280px;
+  }
+
+  .toggle-btn.right {
+    right: 320px;
+  }
+
+  /* Ajuste de botones cuando se colapsa */
+  #app.left-collapsed .toggle-btn.left {
+    left: 0;
+  }
+
+  #app.right-collapsed .toggle-btn.right {
+    right: 0;
+  }
+
+  #app.both-collapsed .toggle-btn.left {
+    left: 0;
+  }
+
+  #app.both-collapsed .toggle-btn.right {
+    right: 0;
+  }
 }
 
 /* =========================================================
-   MOBILE (OVERLAY)
+   MOBILE (RESPONSIVE LIMPIO)
    ========================================================= */
 
 @media (max-width: 900px) {
 
+  /* Layout general */
   #app {
-    min-height: 100vh;
+    height: 100vh;
+    grid-template-rows: 64px 1fr;
     grid-template-columns: 100%;
     grid-template-areas:
       "header"
       "map";
   }
 
+  /* Mapa */
+  #map-container {
+    grid-area: map;
+    height: 100%;
+    min-height: 0;
+    position: relative;
+  }
+
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Paneles overlay */
   #sidebar-left,
   #sidebar-right {
     position: absolute;
     top: 64px;
-    height: calc(100% - 64px);
+    height: calc(100vh - 64px);
     width: 280px;
     background: #f5f7fb;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     transition: transform 0.3s ease;
     z-index: 20;
+    padding: 16px;
   }
 
   #sidebar-left {
@@ -373,6 +457,7 @@ button.btn.secondary {
     transform: translateX(0);
   }
 
+  /* Botones de panel */
   .toggle-btn {
     top: 72px;
   }
@@ -380,18 +465,18 @@ button.btn.secondary {
   .toggle-btn.left { left: 8px; }
   .toggle-btn.right { right: 8px; }
 
+  /* Controles del mapa */
+  .map-controls {
+    bottom: 15px;
+  }
+
   /* Ocultar controles si hay panel abierto */
   #app.panel-open .map-controls {
     display: none;
   }
-  
-    .map-controls {
-    bottom: 15px;
-  }
-  
 }
 
-    </style>
+  </style>
   </head>
 
   <body>
@@ -785,17 +870,16 @@ function updateLayout() {
     } else {
       app.classList.remove('panel-open');
     }
-  
+  }
+
   btnLeft.textContent = left ? '❯' : '❮';
   btnRight.textContent = right ? '❮' : '❯';
 
-  requestAnimationFrame(() => map.updateSize());
-}
-
-
-  // 🔄 Recalcular mapa SIEMPRE
+  /* 🔥 CLAVE: esperar a que el grid termine */
   requestAnimationFrame(() => {
-    map.updateSize();
+    requestAnimationFrame(() => {
+      map.updateSize();
+    });
   });
 }
 
