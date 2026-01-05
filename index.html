@@ -303,6 +303,75 @@ body {
   overflow-x: hidden;
 }
 
+#map-container {
+  overflow: visible;
+}
+
+/* =========================================================
+   POPUP OPENLAYERS
+   ========================================================= */
+
+.ol-popup {
+  position: absolute;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 220px;
+  z-index: 3000;
+  pointer-events: auto;
+}
+
+/* Flechita del popup */
+.ol-popup:after,
+.ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: #ffffff;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+
+/* Botón cerrar */
+.ol-popup-closer {
+  text-decoration: none;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 16px;
+  color: #999999;
+}
+
+.ol-popup-closer:after {
+  content: "✖";
+}
+
+/* Contenido del popup */
+#popup-content {
+  font-size: 13px;
+  color: #22314a;
+  line-height: 1.4;
+}
+
 /* =========================================================
    DESKTOP (GRID DINÁMICO LIMPIO)
    ========================================================= */
